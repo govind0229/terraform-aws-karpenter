@@ -1,0 +1,47 @@
+clusterName: my-cluster
+namespace: default
+
+ec2nodeclass:
+  name: default
+  amiFamily: AL2
+  role: KarpenterNodeRole
+  subnetDiscoveryTag: my-cluster
+  amiId: ami-12345678
+  tags:
+    InstanceName: karpenter
+    costControlPurpose: karpenter
+    expiry: never
+    owner: "Agilehawks"
+
+nodepool:
+  name: default
+  requirements:
+    arch:
+      - amd64
+    os:
+      - linux
+    capacityType:
+      - on-demand
+      - spot
+    instanceCategory:
+      - c
+      - m
+      - r
+    instanceGeneration:
+      - "4"
+    instanceType:
+      - m6g.16xlarge
+      - m6gd.16xlarge
+      - r6g.16xlarge
+      - r6gd.16xlarge
+      - c6g.16xlarge
+  nodeClassRef:
+    group: karpenter.k8s.aws
+    kind: EC2NodeClass
+    name: default
+  expireAfter: 720h
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 15s
+    budgets:
+      nodes: 10%

@@ -1,0 +1,37 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: {{ .Values.nodepool.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    spec:
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: {{ toYaml .Values.nodepool.requirements.arch | nindent 10 }}
+        - key: kubernetes.io/os
+          operator: In
+          values: {{ toYaml .Values.nodepool.requirements.os | nindent 10 }}
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: {{ toYaml .Values.nodepool.requirements.capacityType | nindent 10 }}
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: {{ toYaml .Values.nodepool.requirements.instanceCategory | nindent 10 }}
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: {{ toYaml .Values.nodepool.requirements.instanceGeneration | nindent 10 }}
+        - key: node.kubernetes.io/instance-type
+          operator: NotIn
+          values: {{ toYaml .Values.nodepool.requirements.instanceType | nindent 10 }}
+      nodeClassRef:
+        group: {{ .Values.nodepool.nodeClassRef.group }}
+        kind: {{ .Values.nodepool.nodeClassRef.kind }}
+        name: {{ .Values.nodepool.nodeClassRef.name }}
+      expireAfter: {{ .Values.nodepool.expireAfter }}
+  disruption:
+    consolidationPolicy: {{ .Values.nodepool.disruption.consolidationPolicy }}
+    consolidateAfter: {{ .Values.nodepool.disruption.consolidateAfter }}
+    budgets:
+      - nodes: {{ .Values.nodepool.disruption.budgets.nodes }}

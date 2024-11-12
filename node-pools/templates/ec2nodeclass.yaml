@@ -1,0 +1,22 @@
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: {{ .Values.ec2nodeclass.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  amiFamily: {{ .Values.ec2nodeclass.amiFamily }}
+  role: {{ .Values.ec2nodeclass.role }}
+  subnetSelectorTerms:
+    - tags:
+        "karpenter.sh/discovery": {{ .Values.ec2nodeclass.subnetDiscoveryTag }}
+  securityGroupSelectorTerms:
+    - tags:
+        "kubernetes.io/cluster/{{ .Values.clusterName }}": "owned"
+  amiSelectorTerms:
+    - id: {{ .Values.ec2nodeclass.amiId }}
+  tags:
+    environment_name: {{ .Values.clusterName }}
+    Name: {{ .Values.ec2nodeclass.tags.InstanceName }}
+    "cost-control:purpose": {{ .Values.ec2nodeclass.tags.costControlPurpose }}
+    expiry: {{ .Values.ec2nodeclass.tags.expiry }}
+    owner: {{ .Values.ec2nodeclass.tags.owner }}
