@@ -13,9 +13,13 @@ This Terraform module creates Karpenter node pools and associated resources usin
 
 ```hcl
 module "karpenter_node_pools" {
-  source = "./path-to-your-module"
+  source = "karpenter"
 
-  cluster_name = "your-cluster-name"
+  cluster_name                        = "your-cluster-name"
+  cluster_endpoint                    = "https://xyz"
+  cluster_openid_connect_provider_arn = "xyz"
+  cluster_openid_connect_provider_url = "https://xyz"
+  
 
 // To automatically update the EKS node AMI image when updating EKS, you can use the following variable and remove the ami_id from your node_pools configuration:
 
@@ -24,27 +28,27 @@ module "karpenter_node_pools" {
 
   node_pools = [
     {
-      name                = "karpenter-nodepool-1"
-      ami_id              = "ami-12345678"  # This is being manually specified
-      subnet_discovery_tag = "cluster1"
+      name                  = "karpenter-nodepool-1"
+      ami_id                = "ami-12345678"  # This is being manually specified
+      subnet_discovery_tag  = "cluster1"
       tags = {
-        environment_name  = "dev"
-        instanceName      = "Karpenter-cluster1"
-        # "cost-control:purpose" = "testing"
-        owner             = "user1"
+        environment_name          = "dev"
+        instanceName              = "Karpenter-cluster1"
+        # "cost-control:purpose"  = "testing"
+        owner                     = "user1"
       }
     },
-    {
-      name                = "karpenter-nodepool-2"
-      ami_id              = "ami-87654321"  # This is being manually specified
-      subnet_discovery_tag = "cluster2"
-      tags = {
-        environment_name  = "dev"
-        instanceName      = "Karpenter-cluster2"
-        # "cost-control:purpose" = "testing"
-        owner             = "user2"
-      }
-    }
+    # {
+    #  name                  = "karpenter-nodepool-2"
+    #  ami_id                = "ami-87654321"  # This is being manually specified
+    #  subnet_discovery_tag  = "cluster2"
+    #  tags = {
+    #    environment_name         = "dev"
+    #    instanceName             = "Karpenter-cluster2"
+    #    # "cost-control:purpose" = "testing"
+    #    owner                    = "user2"
+    #  }
+    # }
   ]
 }
 ```

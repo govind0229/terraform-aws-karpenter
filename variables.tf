@@ -32,11 +32,6 @@ variable "namespace" {
   default     = "kube-system"
 }
 
-variable "karpenter_controller_role_arn" {
-  description = "The ARN of the IAM role to use for Karpenter"
-  type        = string
-}
-
 // Karpenter node pool required variables
 variable "node_pools" {
   description = "List of node pool configurations"
