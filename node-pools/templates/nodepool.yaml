@@ -1,7 +1,7 @@
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
-  name: {{ .Values.nodepool.name }}
+  name: {{ .Values.name }}
   namespace: {{ .Values.namespace }}
 spec:
   template:

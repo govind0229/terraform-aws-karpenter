@@ -1,7 +1,7 @@
 apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
 metadata:
-  name: {{ .Values.ec2nodeclass.name }}
+  name: {{ .Values.name }}
   namespace: {{ .Values.namespace }}
 spec:
   amiFamily: {{ .Values.ec2nodeclass.amiFamily }}

@@ -37,6 +37,11 @@ resource "helm_release" "karpenter_nodepool" {
   chart = "${path.module}/node-pools"
 
   set {
+    name  = "name"
+    value = each.value.name
+  }
+  
+  set {
     name  = "clusterName"
     value = var.cluster_name
   }

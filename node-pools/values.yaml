@@ -1,8 +1,8 @@
 clusterName: my-cluster
 namespace: default
+name : default
 
 ec2nodeclass:
-  name: default
   amiFamily: AL2
   role: KarpenterNodeRole
   subnetDiscoveryTag: my-cluster
@@ -14,7 +14,6 @@ ec2nodeclass:
     owner: "Agilehawks"
 
 nodepool:
-  name: default
   requirements:
     arch:
       - amd64

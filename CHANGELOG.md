@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+
+## [1.0.1] - 2024-11-13
+
+### Changed
+
+- Updated `main.tf` to dynamically create `karpenter_nodepool` resources based on user-defined configurations.
+- Modified `name` attribute in `helm_release` resource to correctly reference the node pool name.
+- Updated node-pools Helm chart to correctly reference the node pool name.
+
 ## [1.0.0] - 2024-11-12
 
 ### Added
