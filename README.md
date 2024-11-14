@@ -29,7 +29,7 @@ module "karpenter_node_pools" {
   node_pools = [
     {
       name                  = "karpenter-nodepool-1"
-      eks_custom_ami_id     = null  # This is being manually specified eks nodes ami id
+      eks_custom_ami_id     = ""  # This is being manually specified eks nodes ami id
       subnet_discovery_tag  = "cluster1"
       tags = {
         environment_name          = "dev"
@@ -40,7 +40,7 @@ module "karpenter_node_pools" {
     },
     # {
     #  name                  = "karpenter-nodepool-2"
-    #  eks_custom_ami_id     = null  # This is being manually specified eks nodes ami id
+    #  eks_custom_ami_id     = ""  # This is being manually specified eks nodes ami id
     #  subnet_discovery_tag  = "cluster2"
     #  tags = {
     #    environment_name         = "dev"
