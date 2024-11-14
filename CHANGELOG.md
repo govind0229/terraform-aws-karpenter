@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.2] - 2024-11-14
+
+### Changed
+
+- Fixed unknown error with data resource.
+- Added condition to manage and allow the option to use a given EKS custom AMI ID for the node pool.
 
 ## [1.0.1] - 2024-11-13
 

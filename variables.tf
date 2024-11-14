@@ -37,15 +37,16 @@ variable "node_pools" {
   description = "List of node pool configurations"
   type = list(object({
     name                 = string
-    ami_id               = string
     subnet_discovery_tag = string
+    eks_custom_ami_id    = string
     tags                 = map(string)
   }))
   default = []
 }
 
 variable "eks_ami_release_version" {
-  description = "The version of the EKS AMI to use"
+  description = "The version of the EKS AMI to use e.g. `1.28.13-20240928`"
   type        = string
-  default     = "1.28.8-20240703"
+  default     = null 
 }
+

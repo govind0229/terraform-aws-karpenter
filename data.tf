@@ -7,12 +7,14 @@ data "http" "karpenter_cloudformation" {
 }
 
 // EKS AMI for Karpenter node pool creation
-data "aws_ami" "eks_ami" {
+data "aws_ami" "eks_ami_query" {
+  count = local.eks_ami_query != null ? 1 : 0
+  
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${var.eks_ami_release_version}*"]
+    values = ["amazon-eks-node-${local.eks_ami_query}*"]
   }
 
   filter {
