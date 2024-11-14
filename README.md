@@ -8,7 +8,6 @@ This Terraform module creates Karpenter node pools and associated resources usin
 - Configure AMI IDs, IAM roles, subnet discovery tags, and custom tags for each node pool.
 - Utilize Helm to manage the lifecycle of Karpenter resources.
 
-
 ### Usage
 
 ```hcl
@@ -21,15 +20,16 @@ module "karpenter_node_pools" {
   cluster_openid_connect_provider_url = "https://xyz"
   
 
-// To automatically update the EKS node AMI image when updating EKS, you can use the following variable and remove the ami_id from your node_pools configuration:
+// To automatically update the EKS node AMI image when updating EKS, you can use the `eks_ami_release_version` variable and set `eks_custom_ami_id` = null in node_pools configuration:
 
- # eks_ami_release_version = "1.28.8-20240703" 
-  
+  eks_ami_release_version = "1.28.8-20240703" 
+
+// if you need to set custom eks nodes ami to use `eks_custom_ami_id` in node_pools configuration:
 
   node_pools = [
     {
       name                  = "karpenter-nodepool-1"
-      ami_id                = "ami-12345678"  # This is being manually specified
+      eks_custom_ami_id     = null  # This is being manually specified eks nodes ami id
       subnet_discovery_tag  = "cluster1"
       tags = {
         environment_name          = "dev"
@@ -40,7 +40,7 @@ module "karpenter_node_pools" {
     },
     # {
     #  name                  = "karpenter-nodepool-2"
-    #  ami_id                = "ami-87654321"  # This is being manually specified
+    #  eks_custom_ami_id     = null  # This is being manually specified eks nodes ami id
     #  subnet_discovery_tag  = "cluster2"
     #  tags = {
     #    environment_name         = "dev"

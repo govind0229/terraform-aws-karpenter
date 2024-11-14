@@ -40,7 +40,7 @@ resource "helm_release" "karpenter_nodepool" {
     name  = "name"
     value = each.value.name
   }
-  
+
   set {
     name  = "clusterName"
     value = var.cluster_name
@@ -48,7 +48,7 @@ resource "helm_release" "karpenter_nodepool" {
 
   set {
     name  = "ec2nodeclass.amiId"
-    value = try(each.value.ami_id, data.aws_ami.eks_ami.id)
+    value = try(each.value.eks_custom_ami_id, data.aws_ami.eks_ami_query[0].id)
   }
 
   set {
