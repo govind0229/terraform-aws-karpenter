@@ -55,6 +55,7 @@ module "karpenter" {
 ```
 
 #### Subnet Tagging
+
 For `ec2nodeclass`, you need to tag your `subnets` using the following `key:value` pair. The value clould be the `cluster name` for identification:
 
 ```hcl
@@ -68,10 +69,8 @@ This module does not have any outputs.
 
 ##### Providers
 
-- `aws` - The AWS provider.
-- `helm` - The Helm provider.
-
-### Requirements
-- Terraform >= 0.14.0
-- AWS provider >= 3.0
-- Helm provider >= 2.0
+- [aws ](https://registry.terraform.io/providers/hashicorp/aws)(hashicorp/aws) `>= 4.19.0`
+- [helm ](https://registry.terraform.io/providers/hashicorp/helm)(hashicorp/helm) `>= 2.6.0`
+- [http](https://registry.terraform.io/providers/hashicorp/http)
+- [kubernetes ](https://registry.terraform.io/providers/hashicorp/kubernetes)(hashicorp/kubernetes) `>= 2.16.0`
+- [utils ](https://registry.terraform.io/providers/cloudposse/utils)(cloudposse/utils) `>= 0.17.0`
