@@ -11,10 +11,11 @@ This Terraform module creates Karpenter node pools and associated resources usin
 ### Usage
 
 ```hcl
-module "karpenter_node_pools" {
-  source = "karpenter"
+module "karpenter" {
+  source  = "govind0229/karpenter/aws"
 
-  cluster_name                        = "your-cluster-name"
+
+  cluster_name                        = "cluster1"
   cluster_endpoint                    = "https://xyz"
   cluster_openid_connect_provider_arn = "xyz"
   cluster_openid_connect_provider_url = "https://xyz"
@@ -29,8 +30,8 @@ module "karpenter_node_pools" {
   node_pools = [
     {
       name                  = "karpenter-nodepool-1"
-      eks_custom_ami_id     = ""  # This is being manually specified eks nodes ami id
-      subnet_discovery_tag  = "cluster1"
+      eks_custom_ami_id     = ""                          # This is being manually specified eks nodes ami id
+      subnet_discovery_tag  = "cluster1"                  # The cluster name you used to tag the worker subnets.
       tags = {
         environment_name          = "dev"
         instanceName              = "Karpenter-cluster1"
@@ -40,8 +41,8 @@ module "karpenter_node_pools" {
     },
     # {
     #  name                  = "karpenter-nodepool-2"
-    #  eks_custom_ami_id     = ""  # This is being manually specified eks nodes ami id
-    #  subnet_discovery_tag  = "cluster2"
+    #  eks_custom_ami_id     = ""                           # This is being manually specified eks nodes ami id
+    #  subnet_discovery_tag  = "cluster1"                   # The cluster name you used to tag the worker subnets.
     #  tags = {
     #    environment_name         = "dev"
     #    instanceName             = "Karpenter-cluster2"
@@ -53,6 +54,14 @@ module "karpenter_node_pools" {
 }
 ```
 
+#### Subnet Tagging
+For `ec2nodeclass`, you need to tag your `subnets` using the following `key:value` pair. The value clould be the `cluster name` for identification:
+
+```hcl
+tag_key   = "karpenter.sh/discovery"
+tag_value = "Cluster_name"
+```
+
 ##### Outputs
 
 This module does not have any outputs.
@@ -61,3 +70,8 @@ This module does not have any outputs.
 
 - `aws` - The AWS provider.
 - `helm` - The Helm provider.
+
+### Requirements
+- Terraform >= 0.14.0
+- AWS provider >= 3.0
+- Helm provider >= 2.0
