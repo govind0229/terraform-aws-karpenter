@@ -48,7 +48,12 @@ resource "helm_release" "karpenter_nodepool" {
 
   set {
     name  = "ec2nodeclass.amiId"
-    value = try(each.value.eks_custom_ami_id, data.aws_ami.eks_ami_query[0].id)
+    value = each.value.eks_custom_ami_id != "" ? each.value.eks_custom_ami_id : local.eks_amd_ami_id
+  }
+
+  set {
+    name  = "nodepool.nodeClassRef.name"
+    value = each.value.name
   }
 
   set {
