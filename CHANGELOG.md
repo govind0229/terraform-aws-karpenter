@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Updated `main.tf` to remove `try` function for `ec2nodeclass.amiId` to handle `null` values and fallback to `local.eks_amd_ami_id`.
-- Added condition to manage and allow the option to use a given EKS custom AMI ID for the node pool.
+- Update `main.tf` to remove `try` function for `ec2nodeclass.amiId` to handle `null` values and fallback to `local.eks_amd_ami_id`.
+- Update `NodeGroup` for Reference `EC2NodeClass`
 
 ## [1.0.2] - 2024-11-14
 
