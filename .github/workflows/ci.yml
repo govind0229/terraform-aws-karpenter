@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Validate module
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate example
+        working-directory: examples/complete
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - uses: azure/setup-helm@v4
+
+      - name: Helm template node-pools chart
+        run: |
+          helm template test ./node-pools \
+            --set name=default \
+            --set clusterName=test \
+            --set ec2nodeclass.amiId=ami-12345678 \
+            --set ec2nodeclass.role=KarpenterNodeRole-test \
+            --set ec2nodeclass.subnetDiscoveryTag=test \
+            --set ec2nodeclass.tags.environment_name=dev \
+            --set ec2nodeclass.tags.InstanceName=test-default \
+            --set ec2nodeclass.tags.owner=ci

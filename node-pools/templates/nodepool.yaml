@@ -2,10 +2,30 @@ apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
   name: {{ .Values.name }}
-  namespace: {{ .Values.namespace }}
 spec:
+  {{- if .Values.nodepool.weight }}
+  weight: {{ .Values.nodepool.weight }}
+  {{- end }}
+  {{- with .Values.nodepool.limits }}
+  limits:
+    {{- with .cpu }}
+    cpu: {{ . | quote }}
+    {{- end }}
+    {{- with .memory }}
+    memory: {{ . | quote }}
+    {{- end }}
+  {{- end }}
   template:
+    {{- with .Values.nodepool.labels }}
+    metadata:
+      labels:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
     spec:
+      {{- with .Values.nodepool.taints }}
+      taints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       requirements:
         - key: kubernetes.io/arch
           operator: In

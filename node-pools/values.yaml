@@ -1,6 +1,5 @@
 clusterName: my-cluster
-namespace: default
-name : default
+name: default
 
 ec2nodeclass:
   amiFamily: AL2
@@ -8,12 +7,17 @@ ec2nodeclass:
   subnetDiscoveryTag: my-cluster
   amiId: ami-12345678
   tags:
+    environment_name: dev
     InstanceName: karpenter
     costControlPurpose: karpenter
     expiry: never
-    owner: "Agilehawks"
+    owner: platform
 
 nodepool:
+  weight: 1
+  limits: null
+  labels: {}
+  taints: []
   requirements:
     arch:
       - amd64
@@ -21,7 +25,6 @@ nodepool:
       - linux
     capacityType:
       - on-demand
-      - spot
     instanceCategory:
       - c
       - m
