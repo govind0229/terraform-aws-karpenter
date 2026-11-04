@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-04
+
+### Added
+
+- Vendored CloudFormation templates under `templates/cloudformation-<version>.yaml`
+- `auth_mode` for IRSA, EKS Pod Identity, or both
+- Feature flags: `enable_karpenter_controller`, `enable_cloudformation`, `enable_node_pools`
+- Extended `node_pools` (limits, taints, labels, requirements, disruption, `ami_family`)
+- `controller_helm_additional_set`, `settings.interruptionQueue` on controller Helm release
+- Module outputs and `examples/complete`
+- CI workflow (fmt, validate, helm template)
+- [UPGRADE.md](UPGRADE.md)
+
+### Changed
+
+- Default `karpenter_version` to `1.2.0`
+- Helm provider `>= 3.0.0` list-style `set` blocks
+- Safer AMI resolution and validation for node pools
+- EC2 instance tags use `tags.environment_name` and `tags.instanceName`
+
+### Removed
+
+- Runtime HTTP fetch of CloudFormation from GitHub
+- Unused `kubernetes` and `cloudposse/utils` provider requirements
+- `lifecycle.ignore_changes` on CloudFormation and IAM policy attachment
+
+### Fixed
+
+- Plan failure when `eks_ami_release_version` was null
+- Invalid `instanceName` attribute on node pool objects
+
 ## [1.0.3] - 2024-11-15
 
 ### Changed

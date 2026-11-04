@@ -1,0 +1,18 @@
+cluster_name                         = "my-cluster"
+cluster_endpoint                     = "https://EXAMPLE.gr7.us-east-1.eks.amazonaws.com"
+cluster_certificate_authority_data   = "LS0t..."
+cluster_openid_connect_provider_arn  = "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/EXAMPLE"
+cluster_openid_connect_provider_url  = "https://oidc.eks.us-east-1.amazonaws.com/id/EXAMPLE"
+eks_ami_release_version              = "1.29.0-20241001"
+
+node_pools = [
+  {
+    name                 = "default"
+    subnet_discovery_tag = "my-cluster"
+    tags = {
+      environment_name = "dev"
+      instanceName     = "karpenter-my-cluster"
+      owner            = "platform"
+    }
+  },
+]

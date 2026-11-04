@@ -1,76 +1,115 @@
-# Karpenter Node Pool Terraform Module
+# Karpenter Terraform Module
 
-This Terraform module creates Karpenter node pools and associated resources using Helm.
+Terraform module to install [Karpenter](https://karpenter.sh/) on Amazon EKS: CloudFormation IAM/SQS, controller Helm release (IRSA and/or EKS Pod Identity), and optional NodePool / EC2NodeClass Helm releases.
 
-### Features
+## Features
 
-- Dynamically create multiple Karpenter node pools based on user-defined configurations.
-- Configure AMI IDs, IAM roles, subnet discovery tags, and custom tags for each node pool.
-- Utilize Helm to manage the lifecycle of Karpenter resources.
+- Vendored Karpenter CloudFormation (no runtime fetch from GitHub)
+- Controller auth: `irsa`, `pod_identity`, or `both`
+- Feature flags: controller, CloudFormation, node pools
+- Configurable node pools (limits, taints, labels, requirements, disruption)
+- EKS-optimized AMI lookup or per-pool custom AMI
 
-### Usage
+## Usage
 
 ```hcl
 module "karpenter" {
-  source  = "govind0229/karpenter/aws"
+  source = "govind0229/karpenter/aws"
 
+  cluster_name                        = "my-cluster"
+  cluster_endpoint                    = "https://..."
+  cluster_openid_connect_provider_arn = "arn:aws:iam::123456789012:oidc-provider/..."
+  cluster_openid_connect_provider_url = "https://oidc.eks.region.amazonaws.com/id/..."
 
-  cluster_name                        = "cluster1"
-  cluster_endpoint                    = "https://xyz"
-  cluster_openid_connect_provider_arn = "xyz"
-  cluster_openid_connect_provider_url = "https://xyz"
-  
+  auth_mode         = "irsa" # Fargate: irsa. MNG nodes: pod_identity or both
+  karpenter_version = "1.2.0"
 
-// To automatically update the EKS node AMI image when updating EKS, you can use the `eks_ami_release_version` variable and set `eks_custom_ami_id` = null in node_pools configuration:
-
-  eks_ami_release_version = "1.28.8-20240703" 
-
-// if you need to set custom eks nodes ami to use `eks_custom_ami_id` in node_pools configuration:
+  eks_ami_release_version = "1.29.0-20241001"
 
   node_pools = [
     {
-      name                  = "karpenter-nodepool-1"
-      eks_custom_ami_id     = ""                          # This is being manually specified eks nodes ami id
-      subnet_discovery_tag  = "cluster1"                  # The cluster name you used to tag the worker subnets.
+      name                 = "default"
+      subnet_discovery_tag = "my-cluster"
       tags = {
-        environment_name          = "dev"
-        instanceName              = "Karpenter-cluster1"
-        # "cost-control:purpose"  = "testing"
-        owner                     = "user1"
+        environment_name = "dev"
+        instanceName     = "karpenter-my-cluster"
+        owner            = "platform"
       }
     },
-    # {
-    #  name                  = "karpenter-nodepool-2"
-    #  eks_custom_ami_id     = ""                           # This is being manually specified eks nodes ami id
-    #  subnet_discovery_tag  = "cluster1"                   # The cluster name you used to tag the worker subnets.
-    #  tags = {
-    #    environment_name         = "dev"
-    #    instanceName             = "Karpenter-cluster2"
-    #    # "cost-control:purpose" = "testing"
-    #    owner                    = "user2"
-    #  }
-    # }
   ]
 }
 ```
 
-#### Subnet Tagging
+See [examples/complete](examples/complete) and [UPGRADE.md](UPGRADE.md).
 
-For `ec2nodeclass`, you need to tag your `subnets` using the following `key:value` pair. The value clould be the `cluster name` for identification:
+### Subnet tagging
 
-```hcl
-tag_key   = "karpenter.sh/discovery"
-tag_value = "Cluster_name"
+Tag subnets for discovery:
+
+```text
+karpenter.sh/discovery = <cluster_name_or_tag_value>
 ```
 
-##### Outputs
+Match `subnet_discovery_tag` on each node pool.
 
-This module does not have any outputs.
+### Private clusters
 
-##### Providers
+Ensure VPC endpoints for STS, EC2, and SSM (and other services Karpenter uses). See [Amazon EKS Karpenter best practices](https://docs.aws.amazon.com/eks/latest/best-practices/karpenter.html).
 
-- [aws ](https://registry.terraform.io/providers/hashicorp/aws)(hashicorp/aws) `>= 4.19.0`
-- [helm ](https://registry.terraform.io/providers/hashicorp/helm)(hashicorp/helm) `>= 2.6.0`
-- [http](https://registry.terraform.io/providers/hashicorp/http)
-- [kubernetes ](https://registry.terraform.io/providers/hashicorp/kubernetes)(hashicorp/kubernetes) `>= 2.16.0`
-- [utils ](https://registry.terraform.io/providers/cloudposse/utils)(cloudposse/utils) `>= 0.17.0`
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 1.3 |
+| aws | >= 5.30.0 |
+| helm | >= 3.0.0 |
+
+## Inputs
+
+| Name | Description | Type | Default |
+|------|-------------|------|---------|
+| cluster_name | EKS cluster name | `string` | required |
+| cluster_endpoint | EKS API endpoint | `string` | required |
+| cluster_openid_connect_provider_arn | OIDC provider ARN (required unless `auth_mode = pod_identity`) | `string` | `null` |
+| cluster_openid_connect_provider_url | OIDC provider URL (required unless `auth_mode = pod_identity`) | `string` | `null` |
+| auth_mode | `irsa`, `pod_identity`, or `both` | `string` | `"irsa"` |
+| service_account_name | Controller service account | `string` | `"karpenter"` |
+| enable_karpenter_controller | Install controller Helm release | `bool` | `true` |
+| enable_cloudformation | Create Karpenter CloudFormation stack | `bool` | `true` |
+| enable_node_pools | Install NodePool / EC2NodeClass charts | `bool` | `true` |
+| karpenter_version | Karpenter chart version (needs matching `templates/cloudformation-*.yaml`) | `string` | `"1.2.0"` |
+| namespace | Controller namespace | `string` | `"kube-system"` |
+| controller_helm_additional_set | Extra Helm sets for controller | `map(string)` | `{}` |
+| node_pools | Node pool definitions | `list(object)` | `[]` |
+| eks_ami_release_version | EKS AMI release when pools omit `eks_custom_ami_id` | `string` | `null` |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| karpenter_controller_role_arn | Controller IAM role ARN |
+| karpenter_node_role_name | Node IAM role name |
+| interruption_queue_name | SQS interruption queue name |
+| karpenter_cloudformation_stack_id | CloudFormation stack ID |
+| karpenter_pod_identity_association_id | Pod Identity association ID |
+
+## Node pools only
+
+```hcl
+enable_karpenter_controller = false
+enable_cloudformation       = false # if IAM/SQS already exist
+enable_node_pools           = true
+```
+
+CloudFormation must already provide `KarpenterNodeRole-<cluster>` and related resources.
+
+## Auth mode matrix
+
+| Controller runs on | Suggested `auth_mode` |
+|--------------------|------------------------|
+| EKS Fargate | `irsa` |
+| Managed / Karpenter nodes | `pod_identity` or `both` |
+
+## License
+
+MIT
